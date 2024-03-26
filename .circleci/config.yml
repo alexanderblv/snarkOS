@@ -1,11 +1,11 @@
-version: 2.1
+version: "2.1"
 
 orbs:
   windows: circleci/windows@5.0
 
 commands:
   check_windows:
-    description: "Runs cargo check on Windows"
+    description: "Runs 'cargo check' on Windows"
     parameters:
       workspace_member:
         type: string
@@ -14,15 +14,15 @@ commands:
       - restore_cache:
           key: cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
-          name: "Install Rust and run cargo check"
+          name: "Install Rust and run 'cargo check'"
           command: |
             $ProgressPreference = "SilentlyContinue"
-            # Remove the circleci installed rustc.
+            # Remove the previously installed Rust version.
             choco uninstall rust
-            # Install llvm (libclang for rocksdb).
-            choco install llvm -y 
+            # Install LLVM (libclang for RocksDB).
+            choco install llvm -y
             refreshenv
-            # Install rust with rustup.
+            # Install Rust with rustup.
             Invoke-WebRequest -Uri "https://win.rustup.rs/" -OutFile "C:\rustup-init.exe"
             & C:\rustup-init.exe -y --default-toolchain "stable-x86_64-pc-windows-msvc" --no-modify-path --profile minimal
             $Env:Path += ";$Env:USERPROFILE\.cargo\bin"
@@ -59,7 +59,7 @@ commands:
             mkdir -p "$CIRCLE_WORKING_DIRECTORY/.bin"
             wget https://github.com/mozilla/sccache/releases/download/v0.3.0/sccache-v0.3.0-x86_64-unknown-linux-musl.tar.gz
             tar -C "$CIRCLE_WORKING_DIRECTORY/.bin" -xvf sccache-v0.3.0-x86_64-unknown-linux-musl.tar.gz
-            mv $CIRCLE_WORKING_DIRECTORY/.bin/sccache-v0.3.0-x86_64-unknown-linux-musl/sccache $CIRCLE_WORKING_DIRECTORY/.bin/sccache
+            mv "$CIRCLE_WORKING_DIRECTORY/.bin/sccache-v0.3.0-x86_64-unknown-linux-musl/sccache" "$CIRCLE_WORKING_DIRECTORY/.bin/sccache"
             export PATH="$PATH:$CIRCLE_WORKING_DIRECTORY/.bin"
             export RUSTC_WRAPPER="sccache"
             rm -rf "$CIRCLE_WORKING_DIRECTORY/.cargo/registry"
@@ -318,7 +318,8 @@ jobs:
     steps:
       - run_serial:
           workspace_member: node/sync/locators
-          cache_key: snarkos-node-sync-locators-cache
+          cache_key: snark
+os-node-sync-locators-cache
 
   node-tcp:
     docker:
